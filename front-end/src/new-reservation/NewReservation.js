@@ -21,13 +21,35 @@ function NewReservation(){
       history.goBack();
     }
   
+    function isValidDate(){
+      const combined = reservation.reservation_date + " " + reservation.reservation_time
+      const checkDate = new Date(combined)
+      const today = new Date();
+      console.log(combined)
+      console.log(checkDate)
+      if(checkDate.getDay() === 2 && checkDate < today){
+        setError("date cannot be a Tuesday and it cannot be in the past")
+        return false
+      } else if (checkDate.getDay() === 2){
+        setError("date cannot be a Tuesday")
+        return false
+      } else if (checkDate < today){
+        setError("date cannot be in the past")
+        return false
+      }
+      return true
+    }
+
     function submitHandler(event) {
       event.preventDefault();
+      isValidDate()
+      if(isValidDate()){
       createReservation(reservation)
         .then(() => {
           history.push(`/dashboard?date=${reservation.reservation_date}`);
         })
         .catch(setError);
+      }
     }
   
     function changeHandler({ target: { name, value } }) {

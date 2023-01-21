@@ -32,7 +32,7 @@ function Dashboard({ date }) {
   }
 
   function incrementDate(dateInput,increment) {
-    var dateFormatTotime = new Date(dateInput);
+    var dateFormatTotime = new Date(dateInput + " 00:00");
     var increasedDate = new Date(dateFormatTotime.getTime() +(increment *86400000));
     return increasedDate;
 }
@@ -54,7 +54,7 @@ function formatDate(date) {
   function previousHandler() {
     let dateValue = searchParams.get('date')
     if (!dateValue) dateValue = today();
-    const previousDate = incrementDate(dateValue, 0)
+    const previousDate = incrementDate(dateValue, -1)
     history.push(`/dashboard?date=${formatDate(previousDate)}`)
     loadDashboard();
   }
@@ -62,7 +62,7 @@ function formatDate(date) {
   function nextHandler() {
     let dateValue = searchParams.get('date')
     if (!dateValue) dateValue = today();
-    const nextDate = incrementDate(dateValue, 2)
+    const nextDate = incrementDate(dateValue, 1)
     history.push(`/dashboard?date=${formatDate(nextDate)}`)
     loadDashboard();
   }

@@ -63,43 +63,47 @@ if (people >= 1 && typeof req.body.data.people !== "string") {
   next({ status: 400, message: "people must be a number greater than 1" });
 }
 
-function isValidDate(dateString) {
+function isValidDate(req, res , next) {
+  let dateString = req.body.data.reservation_date
   var regEx = /^\d{4}-\d{2}-\d{2}$/;
-  if(!dateString.match(regEx)) return false;  // Invalid format
+  if(!dateString.match(regEx)){
+    next({ status: 400, message: "reservation_date must be in YYYY-MM-DD format" });
+  }
   var d = new Date(dateString);
   var dNum = d.getTime();
-  if(!dNum && dNum !== 0) return false; // NaN value, Invalid date
-  return d.toISOString().slice(0,10) === dateString;
-}
-
-function isDate(req, res, next) {
-  const date = req.body.data.reservation_date
-  if (isValidDate(date)) {
-    return next();
+  if(!dNum && dNum !== 0) {
+    next({ status: 400, message: "reservation_date must be a valid date" });
   }
-  next({ status: 400, message: "reservation_date must be in YYYY-MM-DD format" });
+  return next()
 }
 
-function is_timeString(str)
+function isFutureDate(req, res, next){
+  const combined = req.body.data.reservation_date + " " + req.body.data.reservation_time
+  const checkDate = new Date(combined)
+  const today = new Date();
+  console.log(combined)
+  console.log(checkDate)
+  if (checkDate.getDay() === 2){
+    next({ status: 400, message: "we are closed on Tuesdays" });
+  } else if (checkDate < today){
+    next({ status: 400, message: "date must be in the future" });
+  }
+ return next();
+}
+
+function isTimeString(req, res, next)
 {
+ let str = req.body.data.reservation_time
  regexp = /^(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$/;
   
         if (regexp.test(str))
           {
-            return true;
+            return next();
           }
         else
           {
-            return false;
+            next({ status: 400, message: "reservation_time must be in HH:MM format" });
           }
-}
-
-function isTime(req, res, next){
-  const time = req.body.data.reservation_time
-  if(is_timeString(time)) {
-    return next();
-  }
-  next({ status: 400, message: "reservation_time must be in HH:MM format" });  
 }
 
 async function create(req, res) {
@@ -114,8 +118,9 @@ module.exports = {
     hasOnlyValidProperties,
     hasRequiredProperties,
     hasPeople,
-    isDate,
-    isTime,
+    isValidDate,
+    isTimeString,
+    isFutureDate,
     asyncErrorBoundary(create),
   ],
 };
