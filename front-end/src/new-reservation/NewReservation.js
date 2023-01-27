@@ -36,7 +36,22 @@ function NewReservation(){
       } else if (checkDate < today){
         setError("date cannot be in the past")
         return false
+      } else if (!isValidTime()){
+        setError("time needs to be between 10:30 AM and 9:30 PM")
+        return false
       }
+      return true
+    }
+
+    function isValidTime(){
+      const time = reservation.reservation_time
+      const hour = Number(time.split(':')[0])
+      const minutes = Number(time.split(':')[1])
+
+      if(hour < 10 || hour > 21) return false
+      if(hour === 10 && minutes < 30) return false
+      if(hour === 21 && minutes > 30) return false
+
       return true
     }
 

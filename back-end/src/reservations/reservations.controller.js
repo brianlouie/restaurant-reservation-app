@@ -77,12 +77,33 @@ function isValidDate(req, res , next) {
   return next()
 }
 
+function isDuringBusinessHours(req, res, next) {
+  const time = req.body.data.reservation_time
+  const hour = Number(time.split(':')[0])
+  const minutes = Number(time.split(':')[1])
+  if((hour < 10 || hour > 21) || (hour === 10 && minutes < 30) || (hour === 21 && minutes > 30)){
+    next({ status: 400, message: "time needs to be between 10:30 AM and 9:30 PM" });  
+  }
+  return next()
+}
+
+Date.prototype.addHours = function(h) {
+  this.setTime(this.getTime() + (h*60*60*1000));
+  return this;
+}
+
 function isFutureDate(req, res, next){
   const combined = req.body.data.reservation_date + " " + req.body.data.reservation_time
-  const checkDate = new Date(combined)
-  const today = new Date();
+  let checkDate = new Date(combined)
+  let today = new Date();
   console.log(combined)
+
+  if(process.env.NODE_ENV){
+   checkDate = checkDate.addHours(-6)
+   today = today.addHours(-6)
+  }
   console.log(checkDate)
+  console.log(today)
   if (checkDate.getDay() === 2){
     next({ status: 400, message: "we are closed on Tuesdays" });
   } else if (checkDate < today){
@@ -121,6 +142,7 @@ module.exports = {
     isValidDate,
     isTimeString,
     isFutureDate,
+    isDuringBusinessHours,
     asyncErrorBoundary(create),
   ],
 };
