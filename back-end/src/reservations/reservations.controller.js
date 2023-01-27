@@ -107,7 +107,7 @@ function isFutureDate(req, res, next){
   if (checkDate.getDay() === 2){
     next({ status: 400, message: "we are closed on Tuesdays" });
   } else if (checkDate < today){
-    next({ status: 400, message: `date must be in the future${checkDate}${today}` });
+    next({ status: 400, message: "date must be in the future" });
   }
  return next();
 }
