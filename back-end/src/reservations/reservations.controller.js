@@ -99,7 +99,6 @@ function isFutureDate(req, res, next){
   console.log(combined)
 
   if(process.env.NODE_ENV){
-   checkDate = checkDate.addHours(-6)
    today = today.addHours(-6)
   }
   console.log(checkDate)
