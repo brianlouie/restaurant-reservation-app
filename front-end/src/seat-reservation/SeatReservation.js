@@ -39,7 +39,7 @@ function SeatReservation({tables, setTables, setTablesError}){
 
       function submitHandler(event) {
         event.preventDefault();
-          seatReservation(reservation_id, seat.table_number)
+          seatReservation(Number(reservation_id), seat.table_number)
           .then(() => {
             history.push(`/dashboard`);
           })
