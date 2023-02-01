@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory } from "react-router-dom";
 import { today } from "../utils/date-time";
@@ -10,7 +10,7 @@ import { today } from "../utils/date-time";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function Dashboard({ date, tables, setTables, tablesError, setTablesError }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   let searchParams = new URLSearchParams(document.location.search);
@@ -19,11 +19,11 @@ function Dashboard({ date }) {
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
-    searchParams = new URLSearchParams(document.location.search)
+    searchParams = new URLSearchParams(document.location.search);
     const abortController = new AbortController();
     setReservationsError(null);
-    if(searchParams.get('date')) {
-      date = searchParams.get('date')
+    if (searchParams.get("date")) {
+      date = searchParams.get("date");
     }
     listReservations({ date }, abortController.signal)
       .then(setReservations)
@@ -31,79 +31,139 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  function incrementDate(dateInput,increment) {
+  function incrementDate(dateInput, increment) {
     var dateFormatTotime = new Date(dateInput + " 00:00");
-    var increasedDate = new Date(dateFormatTotime.getTime() +(increment *86400000));
+    var increasedDate = new Date(
+      dateFormatTotime.getTime() + increment * 86400000
+    );
     return increasedDate;
-}
+  }
 
-function formatDate(date) {
-  var d = new Date(date),
-      month = '' + (d.getMonth() + 1),
-      day = '' + d.getDate(),
+  function formatDate(date) {
+    var d = new Date(date),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
       year = d.getFullYear();
 
-  if (month.length < 2) 
-      month = '0' + month;
-  if (day.length < 2) 
-      day = '0' + day;
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
 
-  return [year, month, day].join('-');
-}
+    return [year, month, day].join("-");
+  }
 
   function previousHandler() {
-    let dateValue = searchParams.get('date')
+    let dateValue = searchParams.get("date");
     if (!dateValue) dateValue = today();
-    const previousDate = incrementDate(dateValue, -1)
-    history.push(`/dashboard?date=${formatDate(previousDate)}`)
+    const previousDate = incrementDate(dateValue, -1);
+    history.push(`/dashboard?date=${formatDate(previousDate)}`);
     loadDashboard();
   }
 
   function nextHandler() {
-    let dateValue = searchParams.get('date')
+    let dateValue = searchParams.get("date");
     if (!dateValue) dateValue = today();
-    const nextDate = incrementDate(dateValue, 1)
-    history.push(`/dashboard?date=${formatDate(nextDate)}`)
+    const nextDate = incrementDate(dateValue, 1);
+    history.push(`/dashboard?date=${formatDate(nextDate)}`);
     loadDashboard();
   }
 
   function todayHandler() {
-    history.push(`/dashboard`)
+    history.push(`/dashboard`);
     date = today();
     loadDashboard();
   }
+
+  const reservationRows = reservations.map((reservation) => (
+    <tr key={reservation.reservation_id}>
+      <th scope="row">{reservation.reservation_id}</th>
+      <td>{reservation.first_name}</td>
+      <td>{reservation.last_name}</td>
+      <td>{reservation.mobile_number}</td>
+      <td>{reservation.reservation_date}</td>
+      <td>{reservation.reservation_time}</td>
+      <td>{reservation.people}</td>
+      <td>{reservation.created_at}</td>
+      <td>
+        {" "}
+        <button
+          onClick={() => history.push(`/reservations/${reservation.reservation_id}/seat`)}
+          className="btn btn-secondary"
+        >
+          Seat
+        </button>
+      </td>
+    </tr>
+  ));
+
+  const tableRows = tables.map((table) => (
+    <tr key={table.table_id}>
+      <th scope="row">{table.table_id}</th>
+      <td>{table.table_name}</td>
+      <td>{table.capacity}</td>
+      <td>{table.reservation_id ? "Occupied" : "Free"}</td>
+    </tr>
+  ));
 
   return (
     <main>
       <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for date {searchParams.get('date') ? searchParams.get('date') : today()}</h4>
+        <h4 className="mb-0">
+          Reservations for date{" "}
+          {searchParams.get("date") ? searchParams.get("date") : today()}
+        </h4>
+        <button
+          type="button"
+          className="btn btn-secondary mr-2"
+          onClick={previousHandler}
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary mr-2"
+          onClick={todayHandler}
+        >
+          Today
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary mr-2"
+          onClick={nextHandler}
+        >
+          Next
+        </button>
       </div>
       <ErrorAlert error={reservationsError} />
-      {JSON.stringify(reservations)}
-      <div>
-      <button
-              type="button"
-              className="btn btn-secondary mr-2"
-              onClick={previousHandler}
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary mr-2"
-              onClick={todayHandler}
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary mr-2"
-              onClick={nextHandler}
-            >
-              Next
-            </button>
-      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Mobile Number</th>
+            <th scope="col">Date</th>
+            <th scope="col">Time</th>
+            <th scope="col">People</th>
+            <th scope="col">Created</th>
+            <th scope="col">Reserve Table</th>
+          </tr>
+        </thead>
+        <tbody>{reservationRows}</tbody>
+      </table>
+      <ErrorAlert error={tablesError} />
+      <h4>Tables</h4>
+      <table className="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Table Name</th>
+            <th scope="col">Capacity</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>{tableRows}</tbody>
+      </table>
     </main>
   );
 }

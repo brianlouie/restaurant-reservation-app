@@ -1,6 +1,20 @@
 const reservationsService = require("./reservations.service.js");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
+async function reservationExists(req, res, next) {
+  const reservation = await reservationsService.read(req.params.reservation_id);
+  if (reservation) {
+    res.locals.reservation = reservation;
+    return next();
+  }
+  next({ status: 404, message: `reservation cannot be found.` });
+}
+
+function read(req, res) {
+  const { reservation: data } = res.locals;
+  res.json({ data });
+}
+
 async function list(req, res) {
   const date = req.query.date;
   let data;
@@ -56,8 +70,7 @@ const hasRequiredProperties = hasProperties(
 );
 
 function hasPeople(req, res, next) {
-  const people = Number(req.body.data.people);
-if (people >= 1 && typeof req.body.data.people !== "string") {
+if (req.body.data.people >= 1 && typeof req.body.data.people !== "string") {
     return next();
   }
   next({ status: 400, message: "people must be a number greater than 1" });
@@ -144,4 +157,5 @@ module.exports = {
     isDuringBusinessHours,
     asyncErrorBoundary(create),
   ],
+  read: [asyncErrorBoundary(reservationExists), read],
 };
