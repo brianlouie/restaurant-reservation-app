@@ -17,12 +17,12 @@ async function tableExists(req, res, next) {
     res.locals.table = table;
     return next();
   }
-  next({ status: 404, message: `table cannot be found.` });
+  next({ status: 404, message: `table ${req.params.table_id} cannot be found.` });
 }
 
 function hasReservationId(req, res, next) {
   const reservation_id = req.body.data.reservation_id
-  if(isNaN(reservation_id)){
+  if(typeof reservation_id !== "number" || reservation_id === null || reservation_id === ""){
     return next({ status: 400, message: "reservation_id must be a number" }); 
   }
   next();
@@ -41,6 +41,18 @@ async function seatReservation(req, res, next) {
   }
   const update = await tablesService.seatReservation(reservationId, table.table_id)
   res.json({ data: update });
+}
+
+async function clearTable(req, res, next) {
+  const {table} = res.locals
+  const removeId = { reservation_id: null }
+
+  if(!table.reservation_id){
+    return next({ status: 400, message: "table is already not occupied" });
+  }
+
+  const clear = await tablesService.seatReservation(removeId, table.table_id)
+  res.json({ data: clear });
 }
 
 async function create(req, res) {
@@ -88,7 +100,7 @@ async function create(req, res) {
     "table_name",
     "capacity",
   );
-  const requestHasId = hasProperties(
+  const requestHasIdProperty = hasProperties(
     "reservation_id",
   )
 
@@ -127,7 +139,11 @@ seatReservation: [
   hasReservationId,
   asyncErrorBoundary(reservationExists),
   asyncErrorBoundary(tableExists),
-  requestHasId,
+  requestHasIdProperty,
   asyncErrorBoundary(seatReservation),
-]
+],
+clearTable: [
+  asyncErrorBoundary(tableExists),
+  asyncErrorBoundary(clearTable),
+],
 }

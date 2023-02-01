@@ -50,7 +50,7 @@ function Routes() {
         <SeatReservation tables={tables} setTables={setTables} setTablesError={setTablesError}/>
       </Route>
       <Route path="/dashboard">
-        <Dashboard date={query.get("date") || today()} tables={tables} setTables={setTables} tablesError={tablesError} setTablesError={setTablesError} />
+        <Dashboard date={query.get("date") || today()} tables={tables} setTables={setTables} tablesError={tablesError} setTablesError={setTablesError} loadTables={loadTables}/>
       </Route>
       <Route path="/tables/new">
         <NewTable setTables={setTables} setTablesError={setTablesError} tablesError={tablesError}/>

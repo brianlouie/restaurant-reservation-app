@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import { listReservations, listTables, clearTable } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory } from "react-router-dom";
 import { today } from "../utils/date-time";
@@ -10,7 +10,7 @@ import { today } from "../utils/date-time";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date, tables, setTables, tablesError, setTablesError }) {
+function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadTables }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   let searchParams = new URLSearchParams(document.location.search);
@@ -86,7 +86,9 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError }) {
       <td>
         {" "}
         <button
-          onClick={() => history.push(`/reservations/${reservation.reservation_id}/seat`)}
+          onClick={() =>
+            history.push(`/reservations/${reservation.reservation_id}/seat`)
+          }
           className="btn btn-secondary"
         >
           Seat
@@ -95,12 +97,40 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError }) {
     </tr>
   ));
 
+  function finishButtonHandler(table_id) {
+    if (
+      window.confirm(
+        "Is this table ready to seat new guests? This cannot be undone."
+      )
+    ) {
+      clearTable(table_id)
+      .then(loadTables)
+      .catch(setReservationsError)
+    } else {
+
+    }
+  }
+
   const tableRows = tables.map((table) => (
     <tr key={table.table_id}>
       <th scope="row">{table.table_id}</th>
       <td>{table.table_name}</td>
       <td>{table.capacity}</td>
       <td>{table.reservation_id ? "Occupied" : "Free"}</td>
+      {table.reservation_id ? (
+        <td>
+          {" "}
+          <button
+            type="button"
+            className="btn btn-secondary mr-2"
+            onClick={() => finishButtonHandler(table.table_id)}
+          >
+            Finish
+          </button>
+        </td>
+      ) : (
+        <td></td>
+      )}
     </tr>
   ));
 
@@ -160,6 +190,7 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError }) {
             <th scope="col">Table Name</th>
             <th scope="col">Capacity</th>
             <th scope="col">Status</th>
+            <th scope="col">Clear Table</th>
           </tr>
         </thead>
         <tbody>{tableRows}</tbody>

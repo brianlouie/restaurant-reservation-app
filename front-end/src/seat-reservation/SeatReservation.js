@@ -39,8 +39,7 @@ function SeatReservation({tables, setTables, setTablesError}){
 
       function submitHandler(event) {
         event.preventDefault();
-        const url = `/tables/${seat.table_number}/seat/`
-          seatReservation(reservation_id, url)
+          seatReservation(reservation_id, seat.table_number)
           .then(() => {
             history.push(`/dashboard`);
           })
