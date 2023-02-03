@@ -39,8 +39,41 @@ async function seatReservation(req, res, next) {
   if(table.capacity < reservation.people){
     return next({ status: 400, message: "table does not have sufficient capacity" });
   }
-  const update = await tablesService.seatReservation(reservationId, table.table_id)
-  res.json({ data: update });
+  res.locals.update = await tablesService.seatReservation(reservationId, table.table_id)
+  next();
+}
+
+async function updateReservationStatusToSeated(req, res, next) {
+  const updatedStatus = {
+    status: "seated"
+  }
+  const reservation = res.locals.reservation;
+
+  if (reservation.status === "seated") {
+    return next({ status: 400, message: `reservation is already seated` });
+  }
+   await reservationsService.updateReservationStatus(
+    reservation.reservation_id,
+    updatedStatus
+  );
+  res.json({ data: res.locals.update });
+}
+
+async function updateReservationStatusToFinished(req, res, next) {
+  const {table} = res.locals
+  const reservation = await reservationsService.read(table.reservation_id)
+  const updatedStatus = {
+    status: "finished"
+  }
+
+  if (reservation.status === "finished") {
+    return next({ status: 400, message: `reservation is already finished` });
+  }
+   await reservationsService.updateReservationStatus(
+    table.reservation_id,
+    updatedStatus
+  );
+  res.json({ data: res.locals.clear });
 }
 
 async function clearTable(req, res, next) {
@@ -51,8 +84,8 @@ async function clearTable(req, res, next) {
     return next({ status: 400, message: "table is already not occupied" });
   }
 
-  const clear = await tablesService.seatReservation(removeId, table.table_id)
-  res.json({ data: clear });
+  res.locals.clear = await tablesService.seatReservation(removeId, table.table_id)
+  next();
 }
 
 async function create(req, res) {
@@ -141,9 +174,11 @@ seatReservation: [
   asyncErrorBoundary(tableExists),
   requestHasIdProperty,
   asyncErrorBoundary(seatReservation),
+  asyncErrorBoundary(updateReservationStatusToSeated),
 ],
 clearTable: [
   asyncErrorBoundary(tableExists),
   asyncErrorBoundary(clearTable),
+  asyncErrorBoundary(updateReservationStatusToFinished),
 ],
 }

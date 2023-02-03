@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables, clearTable } from "../utils/api";
+import { listReservations, listTables, clearTable, updateReservationStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory } from "react-router-dom";
 import { today } from "../utils/date-time";
@@ -83,9 +83,12 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
       <td>{reservation.reservation_time}</td>
       <td>{reservation.people}</td>
       <td>{reservation.created_at}</td>
-      <td>
+      <td>{reservation.status}</td>
         {" "}
-        <button
+        {reservation.status === "booked" ? (
+        <td>
+          {" "}
+          <button
           onClick={() =>
             history.push(`/reservations/${reservation.reservation_id}/seat`)
           }
@@ -93,11 +96,14 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
         >
           Seat
         </button>
-      </td>
+        </td>
+      ) : (
+        <td></td>
+      )}
     </tr>
   ));
 
-  function finishButtonHandler(table_id) {
+  function finishButtonHandler(table_id, reservation_id) {
     if (
       window.confirm(
         "Is this table ready to seat new guests? This cannot be undone."
@@ -105,6 +111,7 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
     ) {
       clearTable(table_id)
       .then(loadTables)
+      .then(loadDashboard)
       .catch(setReservationsError)
     } else {
 
@@ -123,7 +130,7 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
           <button
             type="button"
             className="btn btn-secondary mr-2"
-            onClick={() => finishButtonHandler(table.table_id)}
+            onClick={() => finishButtonHandler(table.table_id, table.reservation_id)}
           >
             Finish
           </button>
@@ -176,6 +183,7 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
             <th scope="col">Time</th>
             <th scope="col">People</th>
             <th scope="col">Created</th>
+            <th scope="col">Status</th>
             <th scope="col">Reserve Table</th>
           </tr>
         </thead>
