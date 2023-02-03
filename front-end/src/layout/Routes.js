@@ -8,6 +8,7 @@ import NewReservation from "../new-reservation/NewReservation";
 import useQuery from "../utils/useQuery"
 import NewTable from "../new-table/NewTable";
 import SeatReservation from "../seat-reservation/SeatReservation";
+import Search from "../search.js/Search";
 import { listTables } from "../utils/api";
 
 
@@ -55,6 +56,9 @@ function Routes() {
       <Route path="/tables/new">
         <NewTable setTables={setTables} setTablesError={setTablesError} tablesError={tablesError}/>
       </Route>
+      <Route exact={true} path="/search">
+          <Search />
+        </Route>
       <Route>
         <NotFound />
       </Route>

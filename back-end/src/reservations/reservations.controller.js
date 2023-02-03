@@ -20,9 +20,14 @@ function read(req, res) {
 
 async function list(req, res) {
   const date = req.query.date;
+  const mobile_number = req.query.mobile_number;
   let data;
-  if (date) data = await reservationsService.listDate(date);
-  else {
+  if (date) {
+    data = await reservationsService.listDate(date);
+  } else if (mobile_number) {
+    data = await reservationsService.search(mobile_number);
+  } else {
+    console.log("hi");
     data = await reservationsService.list();
   }
   res.json({
@@ -170,13 +175,16 @@ function hasValidStatus(req, res, next) {
   });
 }
 
- function statusIsBooked(req, res, next) {
-  const status = req.body.data.status
-  if(status && status !== "booked"){
-    return next({ status: 400, message: `status of new reservation cannot be ${status}` }); 
+function statusIsBooked(req, res, next) {
+  const status = req.body.data.status;
+  if (status && status !== "booked") {
+    return next({
+      status: 400,
+      message: `status of new reservation cannot be ${status}`,
+    });
   }
   next();
- }
+}
 
 async function updateReservationStatus(req, res, next) {
   const updatedStatus = req.body.data;
@@ -185,11 +193,13 @@ async function updateReservationStatus(req, res, next) {
   if (reservation.status === "finished") {
     return next({ status: 400, message: `reservation is already finished` });
   }
-   await reservationsService.updateReservationStatus(
+  await reservationsService.updateReservationStatus(
     reservation.reservation_id,
     updatedStatus
   );
-  const updatedReservation = await reservationsService.read(reservation.reservation_id)
+  const updatedReservation = await reservationsService.read(
+    reservation.reservation_id
+  );
   res.json({ data: updatedReservation });
 }
 
