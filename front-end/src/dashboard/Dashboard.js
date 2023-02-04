@@ -73,6 +73,21 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
     loadDashboard();
   }
 
+  function cancelReservationButtonHandler(reservation_id) {
+    if (
+      window.confirm(
+        "Do you want to cancel this reservation? This cannot be undone."
+      )
+    ) {
+    const abortController = new AbortController();
+     updateReservationStatus(reservation_id, "cancelled", abortController.signal)
+     .then(loadDashboard)
+     .catch(setReservationsError)
+    } else {
+
+    }
+  }
+
   const reservationRows = reservations.map((reservation) => (
     <tr key={reservation.reservation_id}>
       <th scope="row">{reservation.reservation_id}</th>
@@ -83,22 +98,55 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
       <td>{reservation.reservation_time}</td>
       <td>{reservation.people}</td>
       <td>{reservation.created_at}</td>
-      <td>{reservation.status}</td>
-        {" "}
-        {reservation.status === "booked" ? (
+      <td>{reservation.status}</td>{" "}
+      {reservation.status === "booked" ? (
+        <>
+          <td>
+            {" "}
+            <button
+              onClick={() =>
+                history.push(`/reservations/${reservation.reservation_id}/seat`)
+              }
+              className="btn btn-secondary"
+            >
+              Seat
+            </button>
+          </td>
+          <td>
+            {" "}
+            <button
+              onClick={() =>
+                history.push(`/reservations/${reservation.reservation_id}/edit`)
+              }
+              className="btn btn-secondary"
+            >
+              Edit
+            </button>
+          </td>
+        </>
+      ) : (
+        <>
+          <td></td>
+          <td></td>
+        </>
+      )}
+      {reservation.status !== "finished" &&
+      reservation.status !== "cancelled" ? (
         <td>
           {" "}
           <button
-          onClick={() =>
-            history.push(`/reservations/${reservation.reservation_id}/seat`)
-          }
-          className="btn btn-secondary"
-        >
-          Seat
-        </button>
+            onClick={() =>
+              cancelReservationButtonHandler(reservation.reservation_id)
+            }
+            className="btn btn-secondary"
+          >
+            Cancel
+          </button>
         </td>
       ) : (
-        <td></td>
+        <>
+          <td></td>
+        </>
       )}
     </tr>
   ));
@@ -185,6 +233,8 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
             <th scope="col">Created</th>
             <th scope="col">Status</th>
             <th scope="col">Reserve Table</th>
+            <th scope="col">Change Reservation</th>
+            <th scope="col">Cancel Reservation</th>
           </tr>
         </thead>
         <tbody>{reservationRows}</tbody>

@@ -9,6 +9,7 @@ import useQuery from "../utils/useQuery"
 import NewTable from "../new-table/NewTable";
 import SeatReservation from "../seat-reservation/SeatReservation";
 import Search from "../search.js/Search";
+import EditReservation from "../edit-reservation/EditReservation";
 import { listTables } from "../utils/api";
 
 
@@ -58,6 +59,9 @@ function Routes() {
       </Route>
       <Route exact={true} path="/search">
           <Search />
+        </Route>
+        <Route exact={true} path="/reservations/:reservation_id/edit">
+          <EditReservation />
         </Route>
       <Route>
         <NotFound />

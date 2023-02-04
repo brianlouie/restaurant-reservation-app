@@ -67,7 +67,7 @@ async function updateReservationStatusToFinished(req, res, next) {
   }
 
   if (reservation.status === "finished") {
-    return next({ status: 400, message: `reservation is already finished` });
+    return next({ status: 400, message: `reservation status is already finished` });
   }
    await reservationsService.updateReservationStatus(
     table.reservation_id,
