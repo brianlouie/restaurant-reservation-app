@@ -110,6 +110,7 @@ async function create(req, res) {
   const VALID_PROPERTIES = [
     "table_name",
     "capacity",
+    "reservation_id",
   ];
   
   function hasOnlyValidProperties(req, res, next) {

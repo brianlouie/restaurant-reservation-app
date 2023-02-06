@@ -17,7 +17,6 @@ function Search() {
   function submitHandler(event) {
     event.preventDefault();
     const abortController = new AbortController();
-    console.log(search.length);
     setError(null);
     listReservations(
       { mobile_number: number.mobile_number },
@@ -43,7 +42,6 @@ function Search() {
       )
     ) {
       const abortController = new AbortController();
-      console.log(lastSearch);
       updateReservationStatus(
         reservation_id,
         "cancelled",

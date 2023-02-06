@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { listReservations, listTables, clearTable, updateReservationStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import { today } from "../utils/date-time";
 
 /**
@@ -97,31 +97,16 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
       <td>{reservation.reservation_date}</td>
       <td>{reservation.reservation_time}</td>
       <td>{reservation.people}</td>
-      <td>{reservation.created_at}</td>
-      <td>{reservation.status}</td>{" "}
+      <td data-reservation-id-status={reservation.reservation_id}>{reservation.status}</td>{" "}
       {reservation.status === "booked" ? (
         <>
           <td>
             {" "}
-            <button
-              onClick={() =>
-                history.push(`/reservations/${reservation.reservation_id}/seat`)
-              }
-              className="btn btn-secondary"
-            >
-              Seat
-            </button>
+<Link to={`/reservations/${reservation.reservation_id}/seat`} className='btn btn-secondary'>Seat</Link>
           </td>
           <td>
             {" "}
-            <button
-              onClick={() =>
-                history.push(`/reservations/${reservation.reservation_id}/edit`)
-              }
-              className="btn btn-secondary"
-            >
-              Edit
-            </button>
+            <Link to={`/reservations/${reservation.reservation_id}/edit`} className='btn btn-secondary'>Edit</Link>
           </td>
         </>
       ) : (
@@ -135,6 +120,7 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
         <td>
           {" "}
           <button
+          data-reservation-id-cancel={reservation.reservation_id}
             onClick={() =>
               cancelReservationButtonHandler(reservation.reservation_id)
             }
@@ -171,11 +157,12 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
       <th scope="row">{table.table_id}</th>
       <td>{table.table_name}</td>
       <td>{table.capacity}</td>
-      <td>{table.reservation_id ? "Occupied" : "Free"}</td>
+      <td data-table-id-status={table.table_id}>{table.reservation_id ? "Occupied" : "Free"}</td>
       {table.reservation_id ? (
         <td>
           {" "}
           <button
+          data-table-id-finish={table.table_id}
             type="button"
             className="btn btn-secondary mr-2"
             onClick={() => finishButtonHandler(table.table_id, table.reservation_id)}
@@ -230,7 +217,6 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
             <th scope="col">Date</th>
             <th scope="col">Time</th>
             <th scope="col">People</th>
-            <th scope="col">Created</th>
             <th scope="col">Status</th>
             <th scope="col">Reserve Table</th>
             <th scope="col">Change Reservation</th>

@@ -5,7 +5,6 @@ async function reservationExists(req, res, next) {
   const reservation = await reservationsService.read(req.params.reservation_id);
   if (reservation) {
     res.locals.reservation = reservation;
-    console.log("hi")
     return next();
   }
   next({
@@ -30,7 +29,6 @@ async function list(req, res) {
     data = await reservationsService.search(mobile_number);
   } else if (reservation_id) {
     data = await reservationsService.read(reservation_id);
-    console.log(data)
   } else {
     data = await reservationsService.list();
   }
@@ -137,13 +135,11 @@ function isFutureDate(req, res, next) {
     req.body.data.reservation_date + " " + req.body.data.reservation_time;
   let checkDate = new Date(combined);
   let today = new Date();
-  console.log(combined);
 
   if (process.env.NODE_ENV) {
     today = today.addHours(-6);
   }
-  console.log(checkDate);
-  console.log(today);
+
   if (checkDate.getDay() === 2) {
     next({ status: 400, message: "we are closed on Tuesdays" });
   } else if (checkDate < today) {
