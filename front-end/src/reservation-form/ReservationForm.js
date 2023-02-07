@@ -39,8 +39,6 @@ function ReservationForm(){
       const combined = reservation.reservation_date + " " + reservation.reservation_time
       const checkDate = new Date(combined)
       const today = new Date();
-      console.log(combined)
-      console.log(checkDate)
       if(checkDate.getDay() === 2 && checkDate < today){
         setError("date cannot be a Tuesday and it cannot be in the past")
         return false
@@ -81,14 +79,15 @@ function ReservationForm(){
           })
           .catch(setError);
         }
-      }
+      } else {
       if(isValidDate()){
       updateReservation(reservation, reservation_id)
         .then(() => {
-            history.goBack();
+            history.push(`/dashboard?date=${reservation.reservation_date}`);
         })
         .catch(setError);
       }
+    }
     }
   
     function changeHandler({ target: { name, value } }) {

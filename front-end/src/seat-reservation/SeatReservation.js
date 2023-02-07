@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { seatReservation, listTables, updateReservationStatus } from "../utils/api";
+import { seatReservation, listTables, } from "../utils/api";
 
 
 function SeatReservation({tables, setTables, setTablesError}){
@@ -9,12 +9,13 @@ function SeatReservation({tables, setTables, setTablesError}){
     const { reservation_id } = useParams();
 
     const [seat, setSeat] = useState({
-        table_number: "",
+        table_id: "",
       });
     const [error, setError] = useState(null);  
 
     const freeTables = tables.filter((table) => {
-       if(!table.reservation_id) return table
+       if(!table.reservation_id) return true
+       else return false
     })
 
     function loadTables() {
@@ -39,7 +40,7 @@ function SeatReservation({tables, setTables, setTablesError}){
 
       function submitHandler(event) {
         event.preventDefault();
-          seatReservation(Number(reservation_id), seat.table_number)
+          seatReservation(Number(reservation_id), seat.table_id)
           .then(() => {
             history.push(`/dashboard`);
           })
@@ -57,9 +58,9 @@ function SeatReservation({tables, setTables, setTablesError}){
           </label>
           <select
             className="form-control"
-            id="table_number"
-            name="table_number"
-            value={seat.table_number}
+            id="table_id"
+            name="table_id"
+            value={seat.table_id}
             onChange={changeHandler}
             required={true}
           >

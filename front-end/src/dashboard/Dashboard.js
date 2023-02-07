@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables, clearTable, updateReservationStatus } from "../utils/api";
+import { listReservations, clearTable, updateReservationStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory, Link } from "react-router-dom";
 import { today } from "../utils/date-time";
@@ -10,7 +10,7 @@ import { today } from "../utils/date-time";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadTables }) {
+function Dashboard({ date, tables, tablesError, loadTables }) {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   let searchParams = new URLSearchParams(document.location.search);
@@ -19,11 +19,15 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
-    searchParams = new URLSearchParams(document.location.search);
+   let searchParams = new URLSearchParams(document.location.search);
     const abortController = new AbortController();
     setReservationsError(null);
     if (searchParams.get("date")) {
-      date = searchParams.get("date");
+     let date = searchParams.get("date");
+     listReservations({ date }, abortController.signal)
+     .then(setReservations)
+     .catch(setReservationsError)
+     return () => abortController.abort();
     }
     listReservations({ date }, abortController.signal)
       .then(setReservations)
@@ -56,7 +60,7 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
     if (!dateValue) dateValue = today();
     const previousDate = incrementDate(dateValue, -1);
     history.push(`/dashboard?date=${formatDate(previousDate)}`);
-    loadDashboard();
+
   }
 
   function nextHandler() {
@@ -64,13 +68,13 @@ function Dashboard({ date, tables, setTables, tablesError, setTablesError, loadT
     if (!dateValue) dateValue = today();
     const nextDate = incrementDate(dateValue, 1);
     history.push(`/dashboard?date=${formatDate(nextDate)}`);
-    loadDashboard();
+
   }
 
   function todayHandler() {
     history.push(`/dashboard`);
     date = today();
-    loadDashboard();
+
   }
 
   function cancelReservationButtonHandler(reservation_id) {
