@@ -2,3 +2,10 @@
   background-color: #393a44;
   min-width: 200px;
 }
+
+@media all and (max-width: 1060px) {
+  .side-bar {
+    background-color: #393a44;
+    min-width: 100%;
+  }
+}

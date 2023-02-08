@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   listReservations,
-  clearTable,
+  finishTable,
   updateReservationStatus,
 } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
@@ -162,7 +162,7 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
         "Is this table ready to seat new guests? This cannot be undone."
       )
     ) {
-      clearTable(table_id)
+      finishTable(table_id)
         .then(loadTables)
         .then(loadDashboard)
         .catch(setReservationsError);

@@ -69,24 +69,27 @@ function ReservationForm(){
 
     function submitHandler(event) {
       event.preventDefault();
+      const abortController = new AbortController();
       isValidDate()
       //no reservation_id means the user is on the New Reservation page
       if(!reservation_id){
         if(isValidDate()){
-        createReservation(reservation)
+        createReservation(reservation, abortController.signal)
           .then(() => {
             history.push(`/dashboard?date=${reservation.reservation_date}`);
           })
           .catch(setError);
         }
+        return () => abortController.abort();
       } else {
       if(isValidDate()){
-      updateReservation(reservation, reservation_id)
+      updateReservation(reservation, reservation_id, abortController.signal)
         .then(() => {
             history.push(`/dashboard?date=${reservation.reservation_date}`);
         })
         .catch(setError);
       }
+      return () => abortController.abort();
     }
     }
   

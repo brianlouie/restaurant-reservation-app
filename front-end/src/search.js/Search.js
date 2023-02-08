@@ -54,6 +54,7 @@ function Search() {
           )
         )
         .catch(setError);
+      return () => abortController.abort();
     } else {
     }
   }
@@ -72,7 +73,6 @@ function Search() {
       {reservation.status === "booked" ? (
         <>
           <td>
-            {" "}
             <button
               onClick={() =>
                 history.push(`/reservations/${reservation.reservation_id}/seat`)
@@ -83,7 +83,6 @@ function Search() {
             </button>
           </td>
           <td>
-            {" "}
             <button
               onClick={() =>
                 history.push(`/reservations/${reservation.reservation_id}/edit`)
@@ -103,7 +102,6 @@ function Search() {
       {reservation.status !== "finished" &&
       reservation.status !== "cancelled" ? (
         <td>
-          {" "}
           <button
             onClick={() =>
               cancelReservationButtonHandler(reservation.reservation_id)

@@ -47,16 +47,18 @@ function NewTable({setTables, setTablesError}) {
       }
 
       function submitHandler(event) {
+        const abortController = new AbortController();
         event.preventDefault();
         isValid();
         if(isValid()){
-          createTable(table)
+          createTable(table, abortController.signal)
           .then(() => {
             history.push(`/dashboard`);
           })
           .then(loadTables)
           .catch(setError);
         }
+        return () => abortController.abort();
       }
 
 

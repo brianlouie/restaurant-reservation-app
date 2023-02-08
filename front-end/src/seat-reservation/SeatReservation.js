@@ -66,7 +66,7 @@ function SeatReservation({tables, setTables, setTablesError}){
           >
             <option value="">Select a table</option>
             {freeTables.map((table) => (
-                <option value={table.table_id}>{table.table_name} - {table.capacity}</option>
+                <option key={table.table_id} value={table.table_id}>{table.table_name} - {table.capacity}</option>
             ))}
           </select>
         </div>
