@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, clearTable, updateReservationStatus } from "../utils/api";
+import {
+  listReservations,
+  clearTable,
+  updateReservationStatus,
+} from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory, Link } from "react-router-dom";
 import { today } from "../utils/date-time";
@@ -19,15 +23,15 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
-   let searchParams = new URLSearchParams(document.location.search);
+    let searchParams = new URLSearchParams(document.location.search);
     const abortController = new AbortController();
     setReservationsError(null);
     if (searchParams.get("date")) {
-     let date = searchParams.get("date");
-     listReservations({ date }, abortController.signal)
-     .then(setReservations)
-     .catch(setReservationsError)
-     return () => abortController.abort();
+      let date = searchParams.get("date");
+      listReservations({ date }, abortController.signal)
+        .then(setReservations)
+        .catch(setReservationsError);
+      return () => abortController.abort();
     }
     listReservations({ date }, abortController.signal)
       .then(setReservations)
@@ -60,7 +64,6 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
     if (!dateValue) dateValue = today();
     const previousDate = incrementDate(dateValue, -1);
     history.push(`/dashboard?date=${formatDate(previousDate)}`);
-
   }
 
   function nextHandler() {
@@ -68,13 +71,11 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
     if (!dateValue) dateValue = today();
     const nextDate = incrementDate(dateValue, 1);
     history.push(`/dashboard?date=${formatDate(nextDate)}`);
-
   }
 
   function todayHandler() {
     history.push(`/dashboard`);
     date = today();
-
   }
 
   function cancelReservationButtonHandler(reservation_id) {
@@ -83,12 +84,15 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
         "Do you want to cancel this reservation? This cannot be undone."
       )
     ) {
-    const abortController = new AbortController();
-     updateReservationStatus(reservation_id, "cancelled", abortController.signal)
-     .then(loadDashboard)
-     .catch(setReservationsError)
+      const abortController = new AbortController();
+      updateReservationStatus(
+        reservation_id,
+        "cancelled",
+        abortController.signal
+      )
+        .then(loadDashboard)
+        .catch(setReservationsError);
     } else {
-
     }
   }
 
@@ -101,16 +105,27 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
       <td>{reservation.reservation_date}</td>
       <td>{reservation.reservation_time}</td>
       <td>{reservation.people}</td>
-      <td data-reservation-id-status={reservation.reservation_id}>{reservation.status}</td>{" "}
+      <td data-reservation-id-status={reservation.reservation_id}>
+        {reservation.status}
+      </td>
       {reservation.status === "booked" ? (
         <>
           <td>
-            {" "}
-<Link to={`/reservations/${reservation.reservation_id}/seat`} className='btn btn-secondary'>Seat</Link>
+            <Link
+              to={`/reservations/${reservation.reservation_id}/seat`}
+              className="btn btn-secondary"
+            >
+              Seat
+            </Link>
           </td>
           <td>
-            {" "}
-            <Link to={`/reservations/${reservation.reservation_id}/edit`} className='btn btn-secondary'>Edit</Link>
+            
+            <Link
+              to={`/reservations/${reservation.reservation_id}/edit`}
+              className="btn btn-secondary"
+            >
+              Edit
+            </Link>
           </td>
         </>
       ) : (
@@ -122,9 +137,9 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
       {reservation.status !== "finished" &&
       reservation.status !== "cancelled" ? (
         <td>
-          {" "}
+
           <button
-          data-reservation-id-cancel={reservation.reservation_id}
+            data-reservation-id-cancel={reservation.reservation_id}
             onClick={() =>
               cancelReservationButtonHandler(reservation.reservation_id)
             }
@@ -148,11 +163,10 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
       )
     ) {
       clearTable(table_id)
-      .then(loadTables)
-      .then(loadDashboard)
-      .catch(setReservationsError)
+        .then(loadTables)
+        .then(loadDashboard)
+        .catch(setReservationsError);
     } else {
-
     }
   }
 
@@ -161,15 +175,18 @@ function Dashboard({ date, tables, tablesError, loadTables }) {
       <th scope="row">{table.table_id}</th>
       <td>{table.table_name}</td>
       <td>{table.capacity}</td>
-      <td data-table-id-status={table.table_id}>{table.reservation_id ? "Occupied" : "Free"}</td>
+      <td data-table-id-status={table.table_id}>
+        {table.reservation_id ? "Occupied" : "Free"}
+      </td>
       {table.reservation_id ? (
         <td>
-          {" "}
           <button
-          data-table-id-finish={table.table_id}
+            data-table-id-finish={table.table_id}
             type="button"
             className="btn btn-secondary mr-2"
-            onClick={() => finishButtonHandler(table.table_id, table.reservation_id)}
+            onClick={() =>
+              finishButtonHandler(table.table_id, table.reservation_id)
+            }
           >
             Finish
           </button>
