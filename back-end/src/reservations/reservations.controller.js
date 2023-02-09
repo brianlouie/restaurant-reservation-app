@@ -83,6 +83,14 @@ const hasRequiredProperties = hasProperties(
   "people"
 );
 
+function mobileNumberIsValid(req, res, next){
+  if(isNaN(req.body.data.mobile_number)){
+  next({ status: 400, message: "mobile number cannot contain letters" });
+  }
+
+  next();
+}
+
 function hasPeople(req, res, next) {
   if (req.body.data.people >= 1 && typeof req.body.data.people !== "string") {
     return next();
@@ -222,6 +230,7 @@ module.exports = {
     hasOnlyValidProperties,
     hasRequiredProperties,
     hasPeople,
+    mobileNumberIsValid,
     isValidDate,
     isTimeString,
     isFutureDate,
@@ -241,6 +250,7 @@ module.exports = {
     hasOnlyValidProperties,
     hasRequiredProperties,
     hasPeople,
+    mobileNumberIsValid,
     isValidDate,
     isTimeString,
     isFutureDate,
