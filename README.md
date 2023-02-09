@@ -5,8 +5,6 @@ Link to deployed application - https://starter-restaurant-reservation-frontend-n
 ### Summary
 An application designed for restaurant managers that allows you to create a reservation at a restaurant for a specified date and time. You can create tables, which you can seat the reservations at. You can search by mobile number and find a history of all booked, seated, finished, and cancelled reservations.
 
-#### Technology used: React.js, Bootstrap, CSS, Node.js, Express, and PostgreSQL.
-
 ### API
 | Request  | Path        |     Description             |
 | ------------- | ------------- | ------------------- |
@@ -70,3 +68,6 @@ The Search page allows you to find all current and past reservations with just a
 1. You should not need to make changes to the `./front-end/.env` file unless you want to connect to a backend at a location other than `http://localhost:5001`.
 1. Run `npm install` to install project dependencies.
 1. Run `npm run start:dev` to start your server in development mode.
+
+
+#### Technology used: React.js, Bootstrap, CSS, Node.js, Express, and PostgreSQL.
